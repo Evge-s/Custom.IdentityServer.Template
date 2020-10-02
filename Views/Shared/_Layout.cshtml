@@ -27,6 +27,23 @@
                     </ul>
                 </div>
             </div>
+            <div>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <label class="text-white"><strong>@User.Identity.Name</strong></label>
+                    <label></label>
+                    <a asp-controller="Account" asp-action="Logout">Log out </a>
+
+                    @if (User.IsInRole("admin"))
+                    {
+                        <a asp-controller="Account" asp-action="Administration">| Admin</a>
+                    }
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login">Log in</a>
+                }
+            </div>
         </nav>
     </header>
     <div class="container">
