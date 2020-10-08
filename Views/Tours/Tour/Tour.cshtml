@@ -1,0 +1,7 @@
+﻿@model IEnumerable<IFTurist.Models.TourModel.Tour>
+
+@foreach (var item in Model)
+{
+    <img src=@item.ImageLink width="200" height="150">
+    @item.Name
+}

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using IFTurist.Models;
+using IFTurist.Models.TourModel;
 
 namespace IFTurist.Controllers
 {
@@ -20,7 +21,9 @@ namespace IFTurist.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            Tour tour = new Tour() { Id = 1, ImageLink = "/img/tours/yaremche/yaremche.jpg", Name = "Яремче" }; // for test
+            List<Tour> tours = new List<Tour> { tour };      
+            return View(tours);
         }
 
         public IActionResult Privacy()
