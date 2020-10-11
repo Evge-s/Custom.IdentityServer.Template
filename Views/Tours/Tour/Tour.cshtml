@@ -11,10 +11,19 @@
             @if (User.IsInRole("admin"))
             {
                 <div align="center">
-                    <a asp-controller="Tour" asp-action="Edit" class="btn btn-sm btn-outline-secondary">Edit</a>
-                    <a asp-controller="Tour" asp-action="Delete" class="btn btn-sm btn-outline-secondary">Delete</a>
+                    <a asp-controller="Tour" asp-action="Edit" class="btn btn-sm btn-outline-secondary">Редагувати</a>
+                    <a asp-controller="Tour" asp-action="Delete" class="btn btn-sm btn-outline-secondary">Видалити</a>
                 </div>
             }
+        </div>
+    }
+    @if (User.IsInRole("admin"))
+    {
+        <div class="col-lg-4">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Tour" asp-action="AddTour">
+                <img class="img-thumbnail" src="/img/tours/add.jpg" width="300" height="250">
+                <h5 align="center">Додати</h5>
+            </a>
         </div>
     }
 </div>
