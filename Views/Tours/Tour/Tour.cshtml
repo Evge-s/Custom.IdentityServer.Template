@@ -1,7 +1,14 @@
 ﻿@model IEnumerable<IFTurist.Models.TourModel.Tour>
 
-@foreach (var item in Model)
-{
-    <img src=@item.ImageLink width="200" height="150">
-    @item.Name
-}
+
+<div class="row mt-5 mb-2">
+    @foreach (var item in Model)
+    {
+        <div class="col-lg-4">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">
+                <img class="img-thumbnail" src=@item.ImageLink alt="@item.Name" width="300" height="250">       
+                <h5 align="center">@item.Name</h5>
+            </a>
+        </div>
+    }
+</div>
