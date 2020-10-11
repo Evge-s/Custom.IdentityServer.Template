@@ -1,4 +1,5 @@
-﻿using IFTurist.Models.UserModels;
+﻿using IFTurist.Models.TourModel;
+using IFTurist.Models.UserModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace IFTurist.Models.DataModels
@@ -7,6 +8,8 @@ namespace IFTurist.Models.DataModels
     {
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Tour> Tours { get; set; }
+        public DbSet<AboutTour> AboutTours { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options)
            : base(options)
