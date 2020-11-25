@@ -354,5 +354,6 @@ IFTurist.sln
 appsettings.Development.json
 appsettings.json
 Properties/
-wwwroot/
+wwwroot/lib/
+wwwroot/favicon.ico
 
