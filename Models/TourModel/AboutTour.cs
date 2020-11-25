@@ -13,6 +13,9 @@ namespace IFTurist.Models.TourModel
         [Required]
         public string Name { get; set; }
 
+        [Required]
+        public string Description { get; set; }
+
         public string VideoLink { get; set; }
 
        // private List<string> ImageLinks { get; set; }

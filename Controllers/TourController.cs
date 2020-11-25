@@ -18,7 +18,7 @@ namespace IFTurist.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddTour()
+        public IActionResult Create()
         {
             return View();
         }
