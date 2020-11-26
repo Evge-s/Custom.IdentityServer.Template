@@ -1,0 +1,31 @@
+﻿<link rel="stylesheet" href="~/css/ImgPreviewPanel.css" />
+
+<div class="gallery">
+    <ul class="img-list">
+        <li>
+            <a href="~/img/images/img-1-lg.jpg"><img src="~/img/images/img-1-sm.jpg"></a>
+        </li>
+        <li>
+            <a href="~/img/images/img-2-lg.jpg"><img src="~/img/images/img-2-sm.jpg"></a>
+        </li>
+        <li>
+            <a href="~/img/images/img-3-lg.jpg"><img src="~/img/images/img-3-sm.jpg"></a>
+        </li>
+        <li>
+            <a href="~/img/images/img-4-lg.jpg"><img src="~/img/images/img-4-sm.jpg"></a>
+        </li>
+    </ul> @*img-list*@
+
+
+    <div class="lightbox">
+        <div class="overlay"></div>
+        <figure>
+            <span class="prev">&#10094 prev</span>
+            <span class="next">next &#10095</span>
+            <img src="">
+        </figure>
+    </div> @*lightbox*@
+</div> @*galery*@
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="~/js/imgPreviewPanel.js"></script>
