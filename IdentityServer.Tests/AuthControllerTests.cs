@@ -1,7 +1,7 @@
-﻿using IdentityServer.Controllers;
-using IdentityServer.Models.CustomErrors;
-using IdentityServer.Models.DTO.Registeration.Requests;
-using IdentityServer.Models.DTO.Registeration.Responses;
+﻿using IdentityServer.Api.Controllers;
+using IdentityServer.Api.Models.CustomErrors;
+using IdentityServer.Api.Models.DTO.Registeration.Requests;
+using IdentityServer.Api.Models.DTO.Registeration.Responses;
 using IdentityServer.Services.AuthService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
