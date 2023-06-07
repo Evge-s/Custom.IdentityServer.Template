@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IdentityServer\IdentityServer.csproj" />
+    <ProjectReference Include="..\IdentityServer\IdentityServer.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
