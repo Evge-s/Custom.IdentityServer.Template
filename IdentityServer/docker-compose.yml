@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  identityserver:
+    image: your-identityserver-image
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=identity;User=sa;Password=/run/secrets/db_password;TrustServerCertificate=true;
+      - AppSettings__TokenKey=/run/secrets/token_key
+    secrets:
+      - db_password
+      - token_key
+    ports:
+      - "5000:80"
+    depends_on:
+      - db
+    networks:
+      - identitynetwork
+
+  db:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    environment:
+      ACCEPT_EULA: 'Y'
+      SA_PASSWORD_FILE: /run/secrets/db_password
+      MSSQL_PID: Express
+    secrets:
+      - db_password
+    volumes:
+      - dbdata:/var/opt/mssql
+    ports:
+      - "1433:1433"
+    networks:
+      - identitynetwork
+
+volumes:
+  dbdata:
+
+networks:
+  identitynetwork:
+
+secrets:
+  db_password:
+    external: true
+  token_key:
+    external: true
