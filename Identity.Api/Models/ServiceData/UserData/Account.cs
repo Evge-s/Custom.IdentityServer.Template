@@ -1,7 +1,6 @@
-﻿using Identity.Models.ServiceData.Tokens;
-using System.Data;
+﻿using Identity.Api.Models.ServiceData.Tokens;
 
-namespace Identity.Models.ServiceData.UserData
+namespace Identity.Api.Models.ServiceData.UserData
 {
     public class Account
     {

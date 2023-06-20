@@ -1,12 +1,12 @@
-﻿using Identity.Models.ServiceData.Tokens;
-using Identity.Models.ServiceData.UserData;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Identity.Api.Models.ServiceData.Tokens;
+using Identity.Api.Models.ServiceData.UserData;
+using Microsoft.IdentityModel.Tokens;
 
-namespace Identity.Services.JwtService
+namespace Identity.Api.Services.JwtService
 {
     public class JwtService : IJwtService
     {

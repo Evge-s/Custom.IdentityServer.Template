@@ -1,7 +1,8 @@
-using Identity.Middlewares;
-using Identity.Models.ServiceData;
-using Identity.Services.AuthService;
-using Identity.Services.JwtService;
+using Identity.Api.Middlewares;
+using Identity.Api.Models.ServiceData;
+using Identity.Api.Services.AuthService;
+using Identity.Api.Services.EmailService;
+using Identity.Api.Services.JwtService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -27,6 +28,12 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddSingleton<IEmailService>(new EmailService(
+    builder.Configuration.GetValue<string>("EmailServiceData:Domain"),
+    builder.Configuration.GetValue<int>("EmailServiceData:Port"),
+    builder.Configuration.GetValue<string>("EmailServiceData:UserName"),
+    builder.Configuration.GetValue<string>("EmailServiceData:Password")));
 
 // Configure Middleware
 var app = builder.Build();

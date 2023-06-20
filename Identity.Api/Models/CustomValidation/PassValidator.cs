@@ -1,7 +1,7 @@
-﻿using Identity.Models.CustomValidation.Attributes;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Identity.Api.Models.CustomValidation.Attributes;
 
-namespace Identity.Models.CustomValidation
+namespace Identity.Api.Models.CustomValidation
 {
     public abstract class PassValidator
     {

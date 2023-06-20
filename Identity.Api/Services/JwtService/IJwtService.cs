@@ -1,7 +1,7 @@
-﻿using Identity.Models.ServiceData.Tokens;
-using Identity.Models.ServiceData.UserData;
+﻿using Identity.Api.Models.ServiceData.Tokens;
+using Identity.Api.Models.ServiceData.UserData;
 
-namespace Identity.Services.JwtService
+namespace Identity.Api.Services.JwtService
 {
     public interface IJwtService
     {

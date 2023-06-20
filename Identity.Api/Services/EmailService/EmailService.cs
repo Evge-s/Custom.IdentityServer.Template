@@ -1,43 +1,50 @@
-﻿using System.Net.Mail;
-using System.Net;
+﻿using System.Net;
+using System.Net.Mail;
+using System.Web;
 
-namespace Identity.Services.EmailService
+namespace Identity.Api.Services.EmailService
 {
-    public class EmailService
+    public class EmailService : IEmailService
     {
-        private readonly SmtpClient smtpClient;
+        private readonly SmtpClient _smtpClient;
+        private readonly string serviceUserName;
 
-        public EmailService(string smtpHost, int smtpPort, string username, string password)
+        public EmailService(string domain, int port, string username, string password)
         {
-            smtpClient = new SmtpClient(smtpHost, smtpPort)
+            serviceUserName = username;
+            
+            _smtpClient = new SmtpClient()
             {
-                UseDefaultCredentials = false,
-                EnableSsl = true,
-                Credentials = new NetworkCredential(username, password)
+                Host = domain, 
+                Port = port, 
+                Credentials = new NetworkCredential(username, password), 
+                EnableSsl = true
             };
         }
 
-        public async Task SendEmailAsync(string toEmail, string subject, string body)
+        public async Task<bool> SendEmailAsync(string email, string subject, string message)
         {
-            var mailMessage = new MailMessage
-            {
-                From = new MailAddress("youremail@yourdomain.com"),
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = true
-            };
-
-            mailMessage.To.Add(toEmail);
-
+            var mailMessage = new MailMessage(serviceUserName, email, subject, message);
             try
             {
-                await smtpClient.SendMailAsync(mailMessage);
+                await _smtpClient.SendMailAsync(mailMessage);
+                return true;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                // Log or handle the exception
-                throw;
+                Console.WriteLine(e);
+                return false;
             }
+            
+        }
+
+        public string GenerateConfirmationLink(string email)
+        {
+            var random = new Random();
+            var code = random.Next(100000, 999999).ToString();
+            var encodedCode = HttpUtility.UrlEncode(code);
+            var link = $"https://yourdomain.com/confirm?email={email}&code={encodedCode}";
+            return link;
         }
     }
 }

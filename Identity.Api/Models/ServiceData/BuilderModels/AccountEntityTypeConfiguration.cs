@@ -1,8 +1,8 @@
-﻿using Identity.Models.ServiceData.UserData;
+﻿using Identity.Api.Models.ServiceData.UserData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Identity.Models.ServiceData.BuilderModels
+namespace Identity.Api.Models.ServiceData.BuilderModels
 {
     public class AccountEntityTypeConfiguration : IEntityTypeConfiguration<Account>
     {

@@ -1,7 +1,7 @@
-﻿using Identity.Models.CustomErrors;
-using System.Net;
+﻿using System.Net;
+using Identity.Api.Models.CustomErrors;
 
-namespace Identity.Middlewares
+namespace Identity.Api.Middlewares
 {
     public class ErrorHandlerMiddleware
     {

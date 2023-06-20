@@ -1,7 +1,7 @@
-﻿using Identity.Models.ServiceData.UserData;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Identity.Api.Models.ServiceData.UserData;
 
-namespace Identity.Models.ServiceData.Tokens
+namespace Identity.Api.Models.ServiceData.Tokens
 {
     public class RefreshToken
     {

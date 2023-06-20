@@ -1,8 +1,8 @@
-﻿using Identity.Controllers;
-using Identity.Models.CustomErrors;
-using Identity.Models.DTO.Registeration.Requests;
-using Identity.Models.DTO.Registeration.Responses;
-using Identity.Services.AuthService;
+﻿using Identity.Api.Controllers;
+using Identity.Api.Models.CustomErrors;
+using Identity.Api.Models.DTO.Registeration.Requests;
+using Identity.Api.Models.DTO.Registeration.Responses;
+using Identity.Api.Services.AuthService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,16 +12,15 @@ namespace Identity.Tests
 {
     public class AuthControllerTests
     {
-        private readonly Mock<IAuthService> mockAuthService;
-        private readonly Mock<ILogger<AuthController>> mocklogger;
-        private readonly AuthController controller;
+        private readonly Mock<IAuthService> _mockAuthService;
+        private readonly AuthController _controller;
 
         public AuthControllerTests()
         {
-            mockAuthService = new Mock<IAuthService>();
-            mocklogger = new Mock<ILogger<AuthController>>();
+            _mockAuthService = new Mock<IAuthService>();
+            Mock<ILogger<AuthController>> mocklogger = new();
             var httpContext = new DefaultHttpContext();
-            controller = new AuthController(mocklogger.Object, mockAuthService.Object)
+            _controller = new AuthController(mocklogger.Object, _mockAuthService.Object)
             {
                 ControllerContext = new ControllerContext
                 {
@@ -35,15 +34,15 @@ namespace Identity.Tests
         {
             // Arrange
             var request = new RegsterByEmailRequest { Email = "test11@test.com", Password = "Password!123" };
-            mockAuthService
-                .Setup(service => service.Register(request.Email, request.Password))
+            _mockAuthService
+                .Setup(service => service.RegisterByEmail(request.Email, request.Password))
                 .ReturnsAsync(true);
 
             // Act
-            object result = new object();
+            object result;
             try
             {
-                result = await controller.Register(request);
+                result = await _controller.Register(request);
             }
             catch (Exception ex)
             {
@@ -60,15 +59,15 @@ namespace Identity.Tests
         {
             // Arrange
             var request = new RegsterByEmailRequest { Email = "test11@test.com", Password = "Password!123" };
-            mockAuthService
-                .Setup(service => service.Register(request.Email, request.Password))
+            _mockAuthService
+                .Setup(service => service.RegisterByEmail(request.Email, request.Password))
                 .ReturnsAsync(false);
 
             // Act
-            object result = new object();
+            object result;
             try
             {
-                result = await controller.Register(request);
+                result = await _controller.Register(request);
             }
             catch (Exception ex)
             {
@@ -88,12 +87,12 @@ namespace Identity.Tests
             var request = new RegsterByEmailRequest { Email = "test@test.com", Password = "password123" };
             var jwtToken = "fakeJwtToken";
             var refreshToken = "fakeRefreshToken";
-            mockAuthService
-                .Setup(service => service.Login(request.Email, request.Password))
+            _mockAuthService
+                .Setup(service => service.LoginByEmail(request.Email, request.Password))
                 .ReturnsAsync((jwtToken, refreshToken));
 
             // Act
-            var result = await controller.Login(request);
+            var result = await _controller.Login(request);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -107,15 +106,15 @@ namespace Identity.Tests
         {
             // Arrange
             var request = new RegsterByEmailRequest { Email = "test@test.com", Password = "password123" };
-            mockAuthService
-                .Setup(service => service.Login(request.Email, request.Password))
+            _mockAuthService
+                .Setup(service => service.LoginByEmail(request.Email, request.Password))
                 .ThrowsAsync(new UserNotFoundException("User not found"));
 
             // Act
-            object result = new object();
+            object result;
             try
             {
-                result = await controller.Login(request);
+                result = await _controller.Login(request);
             }
             catch (UserNotFoundException ex)
             {
@@ -136,15 +135,15 @@ namespace Identity.Tests
         {
             // Arrange
             var request = new RegsterByEmailRequest { Email = "test@test.com", Password = "password123" };
-            mockAuthService
-                .Setup(service => service.Login(request.Email, request.Password))
+            _mockAuthService
+                .Setup(service => service.LoginByEmail(request.Email, request.Password))
                 .ThrowsAsync(new InvalidPasswordException("Invalid password"));
 
             // Act
-            object result = new object();
+            object result;
             try
             {
-                result = await controller.Login(request);
+                result = await _controller.Login(request);
             }
             catch (InvalidPasswordException ex)
             {

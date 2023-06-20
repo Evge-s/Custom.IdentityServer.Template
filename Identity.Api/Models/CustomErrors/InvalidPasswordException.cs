@@ -1,4 +1,4 @@
-﻿namespace Identity.Models.CustomErrors
+﻿namespace Identity.Api.Models.CustomErrors
 {
     public class InvalidPasswordException : Exception
     {

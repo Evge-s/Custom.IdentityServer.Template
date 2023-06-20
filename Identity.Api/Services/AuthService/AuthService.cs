@@ -1,27 +1,41 @@
-﻿using Identity.Models.CustomErrors;
-using Identity.Models.ServiceData.Tokens;
-using Identity.Models.ServiceData.UserData;
-using Identity.Models.ServiceData;
-using System.Security.Cryptography;
-using Identity.Services.JwtService;
+﻿using System.Security.Cryptography;
+using Identity.Api.Models.CustomErrors;
+using Identity.Api.Models.ServiceData;
+using Identity.Api.Models.ServiceData.Tokens;
+using Identity.Api.Models.ServiceData.UserData;
+using Identity.Api.Services.EmailService;
+using Identity.Api.Services.JwtService;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
-namespace Identity.Services.AuthService
+namespace Identity.Api.Services.AuthService
 {
     public class AuthService : IAuthService
     {
         private readonly ILogger<AuthService> _logger;
-        private readonly ServiceContext _serviceContext;
         private readonly IJwtService _jwtService;
+        private readonly IEmailService _emailService;
+        private readonly ServiceContext _serviceContext;
 
-        public AuthService(ILogger<AuthService> logger, IJwtService jwtService, ServiceContext serviceContext)
+        public AuthService(
+            ILogger<AuthService> logger,
+            IJwtService jwtService,
+            IEmailService emailService,
+            ServiceContext serviceContext)
         {
             _logger = logger;
             _jwtService = jwtService;
+            _emailService = emailService;
             _serviceContext = serviceContext;
         }
 
-        public async Task<bool> Register(string email, string password)
+        public async Task<bool> ConfirmEmail(string email, int code)
+        {
+            return await _serviceContext.ConfirmationEmails
+                .AnyAsync(e => e.Email == email && e.Code == code && e.IsActive);
+        }
+        
+        public async Task<bool> RegisterByEmail(string email, string password)
         {
             if (await UserExist(email))
                 return false;
@@ -40,13 +54,15 @@ namespace Identity.Services.AuthService
 
             _serviceContext.Accounts.Add(acc);
             await _serviceContext.SaveChangesAsync();
-
+            await CleanConfirmedEmailCodes(email);
+            
             return true;
         }
 
-        public async Task<(string, string)> Login(string email, string password)
+        public async Task<(string, string)> LoginByEmail(string email, string password)
         {
-            var acc = await _serviceContext.Accounts.FirstOrDefaultAsync(u => u.Login.ToLower().Equals(email.ToLower()));
+            var acc = await _serviceContext.Accounts.FirstOrDefaultAsync(u =>
+                u.Login.ToLower().Equals(email.ToLower()));
 
             if (acc is null)
             {
@@ -71,11 +87,22 @@ namespace Identity.Services.AuthService
         private async Task<bool> UserExist(string email)
         {
             if (await _serviceContext.Accounts.AnyAsync(a => a.Login.ToLower()
-                .Equals(email.ToLower())))
+                    .Equals(email.ToLower())))
             {
                 return true;
             }
+
             return false;
+        }
+        
+        private async Task CleanConfirmedEmailCodes(string email)
+        {
+            var confirmationsToDelete =
+                await _serviceContext.ConfirmationEmails.Where(e => e.Email == email).ToListAsync();
+
+            _serviceContext.ConfirmationEmails.RemoveRange(confirmationsToDelete);
+
+            await _serviceContext.SaveChangesAsync();
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

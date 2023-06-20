@@ -1,4 +1,4 @@
-﻿namespace Identity.Models.DTO.Registeration.Responses
+﻿namespace Identity.Api.Models.DTO.Registeration.Responses
 {
     public class LoginResponse
     {

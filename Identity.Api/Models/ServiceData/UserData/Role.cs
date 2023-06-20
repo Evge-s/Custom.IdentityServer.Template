@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Identity.Models.ServiceData.UserData
+namespace Identity.Api.Models.ServiceData.UserData
 {
     public class Role : Enumeration
     {

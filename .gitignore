@@ -3,6 +3,13 @@
 
 appsettings*.json
 
+# Rider IDE specific
+.idea/
+*.DotSettings.user
+*.DotSettings
+*.user
+*.sln.iml
+
 # User-specific files
 .suo
 .user

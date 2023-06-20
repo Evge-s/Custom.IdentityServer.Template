@@ -1,9 +1,9 @@
-﻿using Identity.Models.ServiceData.BuilderModels;
-using Identity.Models.ServiceData.Tokens;
-using Identity.Models.ServiceData.UserData;
+﻿using Identity.Api.Models.ServiceData.BuilderModels;
+using Identity.Api.Models.ServiceData.Tokens;
+using Identity.Api.Models.ServiceData.UserData;
 using Microsoft.EntityFrameworkCore;
 
-namespace Identity.Models.ServiceData
+namespace Identity.Api.Models.ServiceData
 {
     public class ServiceContext : DbContext
     {
@@ -12,6 +12,7 @@ namespace Identity.Models.ServiceData
         private readonly IConfiguration _configuration;
         public DbSet<Account> Accounts { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<ConfirmationEmailCode> ConfirmationEmails { get; set; }
 
         public ServiceContext(
             DbContextOptions<ServiceContext> options,

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace Identity.Models.CustomValidation.Attributes
+namespace Identity.Api.Models.CustomValidation.Attributes
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class EmailPatternValidation : ValidationAttribute

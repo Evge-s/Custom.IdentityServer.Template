@@ -1,8 +1,8 @@
-﻿using Identity.Models.ServiceData.Tokens;
+﻿using Identity.Api.Models.ServiceData.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Identity.Models.ServiceData.BuilderModels
+namespace Identity.Api.Models.ServiceData.BuilderModels
 {
     public class RefreshTokenEntityTypeConfiguration : IEntityTypeConfiguration<RefreshToken>
     {
