@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Identity.Api.Models.CustomValidation.Attributes;
 
-namespace Identity.Api.Models.DTO.Registeration.Requests
+namespace Identity.Api.Models.DTO.EmailConfirmation.Requests
 {
     public class ConfirmEmailRequest
     {
@@ -10,6 +10,6 @@ namespace Identity.Api.Models.DTO.Registeration.Requests
         public string Email { get; init; }
         
         [Required(ErrorMessage = "The Confirmation Code is required")]
-        public int ConfirmationCode { get; init; }
+        public string ConfirmationCode { get; init; }
     }
 }

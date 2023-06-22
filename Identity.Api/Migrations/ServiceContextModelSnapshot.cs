@@ -22,7 +22,7 @@ namespace Identity.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Identity.Models.ServiceData.Tokens.RefreshToken", b =>
+            modelBuilder.Entity("Identity.Api.Models.ServiceData.Tokens.RefreshToken", b =>
                 {
                     b.Property<Guid>("AccountId")
                         .HasColumnType("uniqueidentifier");
@@ -44,7 +44,7 @@ namespace Identity.Migrations
                     b.ToTable("RefreshToken", (string)null);
                 });
 
-            modelBuilder.Entity("Identity.Models.ServiceData.UserData.Account", b =>
+            modelBuilder.Entity("Identity.Api.Models.ServiceData.UserData.Account", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -77,9 +77,34 @@ namespace Identity.Migrations
                     b.ToTable("Account", (string)null);
                 });
 
-            modelBuilder.Entity("Identity.Models.ServiceData.Tokens.RefreshToken", b =>
+            modelBuilder.Entity("Identity.Api.Models.ServiceData.UserData.ConfirmationEmailCode", b =>
                 {
-                    b.HasOne("Identity.Models.ServiceData.UserData.Account", "Account")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Confirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ConfirmationEmails");
+                });
+
+            modelBuilder.Entity("Identity.Api.Models.ServiceData.Tokens.RefreshToken", b =>
+                {
+                    b.HasOne("Identity.Api.Models.ServiceData.UserData.Account", "Account")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -88,7 +113,7 @@ namespace Identity.Migrations
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("Identity.Models.ServiceData.UserData.Account", b =>
+            modelBuilder.Entity("Identity.Api.Models.ServiceData.UserData.Account", b =>
                 {
                     b.Navigation("RefreshTokens");
                 });

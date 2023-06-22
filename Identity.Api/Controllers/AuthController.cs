@@ -1,4 +1,5 @@
-﻿using Identity.Api.Models.DTO.Registeration.Requests;
+﻿using Identity.Api.Models.DTO.EmailConfirmation.Requests;
+using Identity.Api.Models.DTO.Registeration.Requests;
 using Identity.Api.Models.DTO.Registeration.Responses;
 using Identity.Api.Services.AuthService;
 using Microsoft.AspNetCore.Authorization;
@@ -20,19 +21,39 @@ namespace Identity.Api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody] RegsterByEmailRequest request)
+        [HttpPost("send-confirmation-code")]
+        public async Task<ActionResult> SendConfirmCode([FromBody] SendConfirmationRequest request)
         {
-            var isNewAccount = await _authService.RegisterByEmail(request.Email, request.Password);
+            var isNewAccount = await _authService.UserExist(request.Email);
             if (!isNewAccount)
                 return BadRequest("the user is already registered");
 
+            var sendConfirmationResult = await _authService.SendConfirmationMail(request.Email);
+
+            if (!sendConfirmationResult)
+            {
+                // return internal error
+                return BadRequest("internal error");
+            }
+
+            return Ok("A confirmation code has been sent to the specified email");
+        }
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<ActionResult> Register([FromBody] RegsterByEmailRequest request)
+        {
+            var registerResult = await _authService.RegisterByEmail(request.Email, request.Password);
+            
+            if (!registerResult)
+                return BadRequest("The mail is not confirmed, or the confirmation is overdue");
+            
             return Ok("The user is successfully registered");
         }
 
         [AllowAnonymous]
         [HttpPost("confirm-email")]
-        public async Task<ActionResult> Confirm([FromQuery] ConfirmEmailRequest request)
+        public async Task<ActionResult> TryConfirmEmailByCode([FromQuery] ConfirmEmailRequest request)
         {
             var isConfirmed = await _authService.ConfirmEmail(request.Email, request.ConfirmationCode);
             if (!isConfirmed)

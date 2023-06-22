@@ -22,5 +22,7 @@ public class ConfirmationEmailEntityTypeConfiguration : IEntityTypeConfiguration
         
         builder.Property(x => x.Created)
             .IsRequired(true);
+
+        builder.Property(x => x.Confirmed);
     }
 }

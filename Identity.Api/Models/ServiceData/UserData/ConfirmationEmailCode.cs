@@ -2,11 +2,19 @@ namespace Identity.Api.Models.ServiceData.UserData;
 
 public class ConfirmationEmailCode
 {
+    public ConfirmationEmailCode(string code, string email)
+    {
+        Email = email;
+        Code = code;
+    }
+    
     public Guid Id { get; set; }
     
     public string Email { get; set; }
     
-    public int Code { get; set; }
+    public string Code { get; set; }
+
+    public bool Confirmed { get; set; }
     
     public  DateTime Created { get; set; } = DateTime.UtcNow;
     

@@ -6,7 +6,6 @@ using Identity.Api.Models.ServiceData.UserData;
 using Identity.Api.Services.EmailService;
 using Identity.Api.Services.JwtService;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Identity.Api.Services.AuthService
 {
@@ -29,15 +28,51 @@ namespace Identity.Api.Services.AuthService
             _serviceContext = serviceContext;
         }
 
-        public async Task<bool> ConfirmEmail(string email, int code)
+        public async Task<bool> SendConfirmationMail(string email)
+        {
+            var code = _emailService.GenerateConfirmationCode();
+            var confirmationLink = _emailService.GenerateConfirmationLink(email, code);
+            var subject = $"Confirmation your email {email}";
+
+            var sendResult = await _emailService.SendMailAsync(email, subject, confirmationLink);
+
+            if (!sendResult)
+                return false;
+
+            var confirmationEmail = new ConfirmationEmailCode(code, email);
+            _serviceContext.ConfirmationEmails.Add(confirmationEmail);
+            await _serviceContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ConfirmEmail(string email, string code)
+        {
+            var confirmation = await _serviceContext.ConfirmationEmails
+                .FirstOrDefaultAsync(e => e.Email == email && e.Code == code);
+            
+            if (confirmation == null || confirmation.IsExpired)
+                return false;
+
+            confirmation.Confirmed = true;
+            _serviceContext.ConfirmationEmails.Update(confirmation);
+            await _serviceContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> IsConfirmedEmail(string email)
         {
             return await _serviceContext.ConfirmationEmails
-                .AnyAsync(e => e.Email == email && e.Code == code && e.IsActive);
+                .AnyAsync(e => e.Email == email && e.Confirmed && e.IsActive);
         }
-        
+
         public async Task<bool> RegisterByEmail(string email, string password)
         {
             if (await UserExist(email))
+                return false;
+
+            // check if the mail is confirmed (need move to cache)
+            if (await IsConfirmedEmail(email))
                 return false;
 
             CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -55,7 +90,7 @@ namespace Identity.Api.Services.AuthService
             _serviceContext.Accounts.Add(acc);
             await _serviceContext.SaveChangesAsync();
             await CleanConfirmedEmailCodes(email);
-            
+
             return true;
         }
 
@@ -84,7 +119,7 @@ namespace Identity.Api.Services.AuthService
             }
         }
 
-        private async Task<bool> UserExist(string email)
+        public async Task<bool> UserExist(string email)
         {
             if (await _serviceContext.Accounts.AnyAsync(a => a.Login.ToLower()
                     .Equals(email.ToLower())))
@@ -94,7 +129,7 @@ namespace Identity.Api.Services.AuthService
 
             return false;
         }
-        
+
         private async Task CleanConfirmedEmailCodes(string email)
         {
             var confirmationsToDelete =
