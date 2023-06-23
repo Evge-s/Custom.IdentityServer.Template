@@ -23,9 +23,7 @@ namespace Identity.Api.Models.ServiceData.BuilderModels
                 .IsRequired(true);
 
             builder.Property(x => x.Role)
-                .HasConversion(
-                v => v.Id,
-                v => Enumeration.FromValue<Role>(v));
+                .HasConversion<string>();
 
             builder.HasMany(x => x.RefreshTokens)
                 .WithOne(t => t.Account)

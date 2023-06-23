@@ -1,4 +1,7 @@
-﻿using Identity.Api.Models.ServiceData.Tokens;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Identity.Api.Models.ServiceData.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Identity.Api.Models.ServiceData.UserData
 {
@@ -11,9 +14,10 @@ namespace Identity.Api.Models.ServiceData.UserData
         public byte[] PasswordHash { get; set; }
 
         public byte[] PasswordSalt { get; set; }
-
-        // set role "Customer" by default
-        public Role Role { get; set; } = Role.From(2);
+        
+        [Column(TypeName = "nvarchar(20)")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Role Role { get; set; } = Role.Customer;
 
         public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 

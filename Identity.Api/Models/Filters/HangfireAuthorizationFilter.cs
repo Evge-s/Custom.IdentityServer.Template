@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Hangfire.Annotations;
 using Hangfire.Dashboard;
+using Identity.Api.Models.ServiceData.UserData;
 
 namespace Identity.Api.Models.Filters;
 
@@ -14,6 +15,6 @@ public class HangfireAuthorizationFilter : IDashboardAuthorizationFilter
         // Allow only if the user is authenticated and has the "Admin" claim
         return user.Identity != null 
                && user.Identity.IsAuthenticated 
-               && user.HasClaim(c => c.Type == ClaimTypes.Role && c.Value == "GeneralAdmin");
+               && user.HasClaim(c => c.Type == ClaimTypes.Role && c.Value == Role.GeneralAdmin.ToString());
     }
 }
