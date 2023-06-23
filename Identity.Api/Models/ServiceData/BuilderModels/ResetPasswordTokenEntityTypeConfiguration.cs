@@ -1,26 +1,23 @@
 using Identity.Api.Models.ServiceData.Tokens;
-using Identity.Api.Models.ServiceData.UserData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Identity.Api.Models.ServiceData.BuilderModels;
 
-public class ConfirmationEmailEntityTypeConfiguration : IEntityTypeConfiguration<ConfirmationEmailCode>
+public class ResetPasswordTokenEntityTypeConfiguration: IEntityTypeConfiguration<ResetPasswordToken>
 {
-    public void Configure(EntityTypeBuilder<ConfirmationEmailCode> builder)
+    public void Configure(EntityTypeBuilder<ResetPasswordToken> builder)
     {
-        builder.ToTable(nameof(ConfirmationEmailCode));
+        builder.ToTable(nameof(ResetPasswordToken));
 
         builder.Property(x => x.Email)
             .HasMaxLength(75)
             .IsRequired(true);
         
-        builder.Property(x => x.Code)
+        builder.Property(x => x.ResetToken)
             .IsRequired(true);
         
         builder.Property(x => x.Created)
             .IsRequired(true);
-
-        builder.Property(x => x.Confirmed);
     }
 }

@@ -7,9 +7,7 @@ public class ConfirmationEmailCode
         Email = email;
         Code = code;
     }
-    
-    public Guid Id { get; set; }
-    
+
     public string Email { get; set; }
     
     public string Code { get; set; }

@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using System.Text;
 using Identity.Api.Models.CustomErrors;
 using Identity.Api.Models.ServiceData;
 using Identity.Api.Models.ServiceData.Tokens;
@@ -49,7 +50,7 @@ namespace Identity.Api.Services.AuthService
         {
             var confirmation = await _serviceContext.ConfirmationEmails
                 .FirstOrDefaultAsync(e => e.Email == email && e.Code == code);
-            
+
             if (confirmation == null || confirmation.IsExpired)
                 return false;
 
@@ -58,12 +59,6 @@ namespace Identity.Api.Services.AuthService
             await _serviceContext.SaveChangesAsync();
 
             return true;
-        }
-
-        public async Task<bool> IsConfirmedEmail(string email)
-        {
-            return await _serviceContext.ConfirmationEmails
-                .AnyAsync(e => e.Email == email && e.Confirmed && e.IsActive);
         }
 
         public async Task<bool> RegisterByEmail(string email, string password)
@@ -88,7 +83,7 @@ namespace Identity.Api.Services.AuthService
             };
 
             _serviceContext.Accounts.Add(acc);
-            await _serviceContext.SaveChangesAsync();
+            // Save changes will be called inside CleanConfirmedEmailCodes()
             await CleanConfirmedEmailCodes(email);
 
             return true;
@@ -119,6 +114,48 @@ namespace Identity.Api.Services.AuthService
             }
         }
 
+        public async Task ChangePassword(string accId, string oldPassword, string newPassword)
+        {
+            var acc = await _serviceContext.Accounts.FindAsync(accId);
+
+            if (acc == null)
+                throw new UserNotFoundException("User not found");
+
+            var isValidPass = VerifyPasswordHash(oldPassword, acc.PasswordHash, acc.PasswordSalt);
+
+            if (!isValidPass)
+                throw new InvalidPasswordException("Invalid password");
+
+            CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
+
+            acc.PasswordHash = passwordHash;
+            acc.PasswordSalt = passwordSalt;
+            _serviceContext.Accounts.Update(acc);
+            await _serviceContext.SaveChangesAsync();
+        }
+
+        public async Task ResetPassword(string email, string resetToken, string newPassword)
+        {
+            var passwordResetToken = await _serviceContext.ResetPasswordTokens
+                .FirstAsync(e => e.Email == email && e.ResetToken == resetToken);
+
+            if (passwordResetToken is { IsExpired: true })
+            {
+                _serviceContext.ResetPasswordTokens.Remove(passwordResetToken);
+                await _serviceContext.SaveChangesAsync();
+                throw new TokenExpiredException("The token has expired");
+            }
+
+            var acc = await _serviceContext.Accounts.FirstAsync(a => a.Login == email);
+
+            CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
+            acc.PasswordHash = passwordHash;
+            acc.PasswordSalt = passwordSalt;
+            _serviceContext.Accounts.Update(acc);
+            _serviceContext.ResetPasswordTokens.Remove(passwordResetToken);
+            await _serviceContext.SaveChangesAsync();
+        }
+
         public async Task<bool> UserExist(string email)
         {
             if (await _serviceContext.Accounts.AnyAsync(a => a.Login.ToLower()
@@ -128,6 +165,12 @@ namespace Identity.Api.Services.AuthService
             }
 
             return false;
+        }
+
+        private async Task<bool> IsConfirmedEmail(string email)
+        {
+            return await _serviceContext.ConfirmationEmails
+                .AnyAsync(e => e.Email == email && e.Confirmed && e.IsActive);
         }
 
         private async Task CleanConfirmedEmailCodes(string email)
@@ -156,6 +199,34 @@ namespace Identity.Api.Services.AuthService
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
+        }
+
+        private static string GenerateRandomPassword()
+        {
+            const string LowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
+            const string UpperCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string SpecialCharacters = "!@#$%^&*";
+            const string Digits = "1234567890";
+            const string AllChars = LowerCaseLetters + SpecialCharacters + UpperCaseLetters + Digits;
+
+            Random rand = new Random();
+            int length = rand.Next(8, 13);
+            StringBuilder password = new StringBuilder(length);
+
+            password.Append(UpperCaseLetters[rand.Next(UpperCaseLetters.Length)]);
+            password.Append(Digits[rand.Next(Digits.Length)]);
+            password.Append(LowerCaseLetters[rand.Next(LowerCaseLetters.Length)]);
+            password.Append(LowerCaseLetters[rand.Next(SpecialCharacters.Length)]);
+
+            for (int i = password.Length; i < length; i++)
+            {
+                password.Append(AllChars[rand.Next(AllChars.Length)]);
+            }
+
+            char[] passwordChars = password.ToString().ToCharArray();
+            Array.Sort(passwordChars, (x, y) => rand.Next(-1, 2));
+
+            return new string(passwordChars);
         }
     }
 }

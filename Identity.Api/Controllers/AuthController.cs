@@ -1,4 +1,7 @@
-﻿using Identity.Api.Models.DTO.EmailConfirmation.Requests;
+﻿using System.Security.Claims;
+using Identity.Api.Models.DTO.EmailConfirmation.Requests;
+using Identity.Api.Models.DTO.Login.Request;
+using Identity.Api.Models.DTO.PasswordReset;
 using Identity.Api.Models.DTO.Registeration.Requests;
 using Identity.Api.Models.DTO.Registeration.Responses;
 using Identity.Api.Services.AuthService;
@@ -64,7 +67,7 @@ namespace Identity.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult> Login([FromBody] RegsterByEmailRequest request)
+        public async Task<ActionResult> Login([FromBody] LoginRequest request)
         {
             var (jwtToken, refreshToken) = await _authService.LoginByEmail(request.Email, request.Password);
             var response = new LoginResponse { Token = jwtToken };
@@ -80,6 +83,28 @@ namespace Identity.Api.Controllers
                 });
 
             return Ok(response);
+        }
+        
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+
+            await _authService.ChangePassword(email, request.Password, request.NewPassword);
+            
+            return Ok("Password successfully changed");
+        }
+        
+        [AllowAnonymous]
+        [HttpPost("reset-password")]
+        public async Task<ActionResult> ResetPassword([FromBody] ConfirmPasswordResetToken request)
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+
+            await _authService.ResetPassword(email, request.PasswordResetToken, request.NewPassword);
+            
+            return Ok("Password successfully changed");
         }
     }
 }

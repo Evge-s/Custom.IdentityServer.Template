@@ -13,6 +13,7 @@ namespace Identity.Api.Models.ServiceData
         public DbSet<Account> Accounts { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ConfirmationEmailCode> ConfirmationEmails { get; set; }
+        public DbSet<ResetPasswordToken> ResetPasswordTokens { get; set; }
 
         public ServiceContext(
             DbContextOptions<ServiceContext> options,
@@ -28,6 +29,8 @@ namespace Identity.Api.Models.ServiceData
         {
             modelBuilder.ApplyConfiguration(new AccountEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new RefreshTokenEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new ConfirmationEmailEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new ResetPasswordTokenEntityTypeConfiguration());
         }
     }
 }

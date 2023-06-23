@@ -1,5 +1,6 @@
 ﻿using Identity.Api.Controllers;
 using Identity.Api.Models.CustomErrors;
+using Identity.Api.Models.DTO.Login.Request;
 using Identity.Api.Models.DTO.Registeration.Requests;
 using Identity.Api.Models.DTO.Registeration.Responses;
 using Identity.Api.Services.AuthService;
@@ -84,7 +85,7 @@ namespace Identity.Tests
         public async Task Login_ShouldReturnOkResult_WhenUserExists()
         {
             // Arrange
-            var request = new RegsterByEmailRequest { Email = "test@test.com", Password = "password123" };
+            var request = new LoginRequest { Email = "test@test.com", Password = "password123" };
             var jwtToken = "fakeJwtToken";
             var refreshToken = "fakeRefreshToken";
             _mockAuthService
@@ -105,7 +106,7 @@ namespace Identity.Tests
         public async Task Login_ShouldReturnNotFoundResult_WhenUserNotFound()
         {
             // Arrange
-            var request = new RegsterByEmailRequest { Email = "test@test.com", Password = "password123" };
+            var request = new LoginRequest { Email = "test@test.com", Password = "password123" };
             _mockAuthService
                 .Setup(service => service.LoginByEmail(request.Email, request.Password))
                 .ThrowsAsync(new UserNotFoundException("User not found"));
@@ -134,7 +135,7 @@ namespace Identity.Tests
         public async Task Login_ShouldReturnBadRequestResult_WhenPasswordIsInvalid()
         {
             // Arrange
-            var request = new RegsterByEmailRequest { Email = "test@test.com", Password = "password123" };
+            var request = new LoginRequest { Email = "test@test.com", Password = "password123" };
             _mockAuthService
                 .Setup(service => service.LoginByEmail(request.Email, request.Password))
                 .ThrowsAsync(new InvalidPasswordException("Invalid password"));

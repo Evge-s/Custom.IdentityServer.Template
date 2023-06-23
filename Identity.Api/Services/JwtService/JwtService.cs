@@ -16,6 +16,7 @@ namespace Identity.Api.Services.JwtService
             {
                 new Claim(ClaimTypes.NameIdentifier, account.Id.ToString()),
                 new Claim(ClaimTypes.Name, account.Login),
+                new Claim(ClaimTypes.Email, account.Login),
                 new Claim(ClaimTypes.Role, account.Role.ToString()),
             };
 

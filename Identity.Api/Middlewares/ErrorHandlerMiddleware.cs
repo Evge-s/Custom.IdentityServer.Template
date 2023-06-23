@@ -32,6 +32,12 @@ namespace Identity.Api.Middlewares
                 httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 await httpContext.Response.WriteAsync(ex.Message);
             }
+            catch (TokenExpiredException ex)
+            {
+                _logger.LogError(ex, "The token has expired");
+                httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                await httpContext.Response.WriteAsync(ex.Message);
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Internal server error occurred");
