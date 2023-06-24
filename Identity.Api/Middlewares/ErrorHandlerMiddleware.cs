@@ -22,27 +22,34 @@ namespace Identity.Api.Middlewares
             }
             catch (UserNotFoundException ex)
             {
-                _logger.LogError(ex, "User not found");
+                _logger.LogError(ex, ex.Message);
                 httpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
                 await httpContext.Response.WriteAsync(ex.Message);
             }
             catch (InvalidPasswordException ex)
             {
-                _logger.LogError(ex, "Invalid password");
+                _logger.LogError(ex, ex.Message);
                 httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 await httpContext.Response.WriteAsync(ex.Message);
             }
             catch (TokenExpiredException ex)
             {
-                _logger.LogError(ex, "The token has expired");
+                _logger.LogError(ex, ex.Message);
+                httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                await httpContext.Response.WriteAsync(ex.Message);
+            }
+            catch (AccountIsBlockedException ex)
+            {
+                _logger.LogError(ex, ex.Message);
                 httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 await httpContext.Response.WriteAsync(ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Internal server error occurred");
+                var message = "Internal server error occurred";
+                _logger.LogError(ex, message);
                 httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                await httpContext.Response.WriteAsync("Internal server error occurred");
+                await httpContext.Response.WriteAsync(message);
             }
         }
     }

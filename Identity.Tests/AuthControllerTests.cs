@@ -76,10 +76,9 @@ namespace Identity.Tests
             }
 
             // Assert
-            var okResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("the user is already registered", okResult.Value);
+            var expectedResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The mail is not confirmed, or the confirmation is overdue", expectedResult.Value);
         }
-
 
         [Fact]
         public async Task Login_ShouldReturnOkResult_WhenUserExists()

@@ -4,6 +4,7 @@ using Identity.Api.Models.DTO.Login.Request;
 using Identity.Api.Models.DTO.PasswordReset;
 using Identity.Api.Models.DTO.Registeration.Requests;
 using Identity.Api.Models.DTO.Registeration.Responses;
+using Identity.Api.Models.ServiceData.UserData;
 using Identity.Api.Services.AuthService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -84,7 +85,39 @@ namespace Identity.Api.Controllers
 
             return Ok(response);
         }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<ActionResult> Logout()
+        {
+            if (Request.Cookies.TryGetValue("RefreshToken", out string refreshToken))
+            {
+                var accId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                await _authService.RevokeRefreshToken(accId, refreshToken);
+                Response.Cookies.Delete("RefreshToken");
         
+                return Ok();
+            }
+
+            return BadRequest("Refresh token is not found in cookies.");
+        }
+
+        [Authorize]
+        [HttpDelete]
+        public async Task<ActionResult> DeleteAccount(string accId)
+        {
+            await _authService.RemoveAccount(accId);
+            return Ok();
+        }
+
+        [Authorize(Roles = "GeneralAdmin")]
+        [HttpPost("block")]
+        public async Task<ActionResult> BlockAccount(string accId)
+        {
+            await _authService.BlockAccount(accId);
+            return Ok();
+        }
+
         [Authorize]
         [HttpPost("change-password")]
         public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)

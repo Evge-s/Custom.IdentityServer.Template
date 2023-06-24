@@ -9,7 +9,7 @@ namespace Identity.Api.Models.ServiceData.UserData
     {
         public Guid Id { get; set; }
 
-        public string Login { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
 
         public byte[] PasswordHash { get; set; }
 
@@ -18,6 +18,8 @@ namespace Identity.Api.Models.ServiceData.UserData
         [Column(TypeName = "nvarchar(20)")]
         [JsonConverter(typeof(StringEnumConverter))]
         public Role Role { get; set; } = Role.Customer;
+        
+        public bool Blocked { get; set; }
 
         public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 

@@ -10,31 +10,33 @@ namespace Identity.Api.Models.ServiceData.BuilderModels
         {
             builder.ToTable(nameof(Account));
 
-            builder.HasKey(x => x.Id);
+            builder.HasKey(a => a.Id);
 
-            builder.Property(x => x.Login)
+            builder.Property(a => a.Email)
                 .HasMaxLength(75)
                 .IsRequired(true);
 
-            builder.Property(x => x.PasswordHash)
+            builder.Property(a => a.PasswordHash)
                 .IsRequired(true);
 
-            builder.Property(x => x.PasswordSalt)
+            builder.Property(a => a.PasswordSalt)
                 .IsRequired(true);
 
-            builder.Property(x => x.Role)
+            builder.Property(a => a.Role)
                 .HasConversion<string>();
 
-            builder.HasMany(x => x.RefreshTokens)
+            builder.Property(a => a.Blocked);
+
+            builder.HasMany(a => a.RefreshTokens)
                 .WithOne(t => t.Account)
-                .HasPrincipalKey(x => x.Id)
+                .HasPrincipalKey(t => t.Id)
                 .HasForeignKey(t => t.AccountId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Property(x => x.CreatedAt)
+            builder.Property(a => a.CreatedAt)
                 .IsRequired();
 
-            builder.Property(x => x.UpdatedAt)
+            builder.Property(a => a.UpdatedAt)
                 .IsRequired();
         }
     }

@@ -75,7 +75,7 @@ namespace Identity.Api.Services.AuthService
             var acc = new Account
             {
                 Id = Guid.NewGuid(),
-                Login = email,
+                Email = email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
                 CreatedAt = DateTime.UtcNow,
@@ -92,11 +92,15 @@ namespace Identity.Api.Services.AuthService
         public async Task<(string, string)> LoginByEmail(string email, string password)
         {
             var acc = await _serviceContext.Accounts.FirstOrDefaultAsync(u =>
-                u.Login.ToLower().Equals(email.ToLower()));
+                u.Email.ToLower().Equals(email.ToLower()));
 
             if (acc is null)
             {
                 throw new UserNotFoundException("User not found");
+            }
+            else if (acc.Blocked)
+            {
+                throw new AccountIsBlockedException("Account is blocked!");
             }
             else if (!VerifyPasswordHash(password, acc.PasswordHash, acc.PasswordSalt))
             {
@@ -111,6 +115,43 @@ namespace Identity.Api.Services.AuthService
                 await _serviceContext.SaveChangesAsync();
 
                 return (jwtToken, refreshToken.Token);
+            }
+        }
+
+        public async Task RevokeRefreshToken(string accId, string refreshToken)
+        {
+            var token = await _serviceContext.RefreshTokens.FirstOrDefaultAsync(
+                rt => rt.Token == refreshToken && rt.AccountId.ToString() == accId);
+
+            if (token != null)
+            {
+                _serviceContext.RefreshTokens.Remove(token);
+                await _serviceContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task RemoveAccount(string accId)
+        {
+            var id = Guid.Parse(accId);
+            var acc = await _serviceContext.Accounts.FindAsync(id);
+
+            if (acc != null)
+            {
+                _serviceContext.Accounts.Remove(acc);
+                await _serviceContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task BlockAccount(string accId)
+        {
+            var id = Guid.Parse(accId);
+            var acc = await _serviceContext.Accounts.FindAsync(id);
+
+            if (acc != null)
+            {
+                acc.Blocked = true;
+                _serviceContext.Accounts.Update(acc);
+                await _serviceContext.SaveChangesAsync();
             }
         }
 
@@ -130,12 +171,19 @@ namespace Identity.Api.Services.AuthService
 
             acc.PasswordHash = passwordHash;
             acc.PasswordSalt = passwordSalt;
+            acc.UpdatedAt = DateTime.UtcNow;
             _serviceContext.Accounts.Update(acc);
             await _serviceContext.SaveChangesAsync();
         }
 
         public async Task ResetPassword(string email, string resetToken, string newPassword)
         {
+            var acc = await _serviceContext.Accounts.FirstAsync(a => a.Email == email);
+            if (acc.Blocked)
+            {
+                throw new AccountIsBlockedException("Account is blocked!");
+            }
+
             var passwordResetToken = await _serviceContext.ResetPasswordTokens
                 .FirstAsync(e => e.Email == email && e.ResetToken == resetToken);
 
@@ -146,11 +194,10 @@ namespace Identity.Api.Services.AuthService
                 throw new TokenExpiredException("The token has expired");
             }
 
-            var acc = await _serviceContext.Accounts.FirstAsync(a => a.Login == email);
-
             CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
             acc.PasswordHash = passwordHash;
             acc.PasswordSalt = passwordSalt;
+            acc.UpdatedAt = DateTime.UtcNow;
             _serviceContext.Accounts.Update(acc);
             _serviceContext.ResetPasswordTokens.Remove(passwordResetToken);
             await _serviceContext.SaveChangesAsync();
@@ -158,7 +205,7 @@ namespace Identity.Api.Services.AuthService
 
         public async Task<bool> UserExist(string email)
         {
-            if (await _serviceContext.Accounts.AnyAsync(a => a.Login.ToLower()
+            if (await _serviceContext.Accounts.AnyAsync(a => a.Email.ToLower()
                     .Equals(email.ToLower())))
             {
                 return true;

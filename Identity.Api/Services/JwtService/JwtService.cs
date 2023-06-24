@@ -10,19 +10,23 @@ namespace Identity.Api.Services.JwtService
 {
     public class JwtService : IJwtService
     {
+        private readonly IConfiguration _config;
+        
+        public JwtService(IConfiguration config)
+        {
+            _config = config;
+        }
+        
         public string GenerateJwtToken(Account account)
         {
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, account.Id.ToString()),
-                new Claim(ClaimTypes.Name, account.Login),
-                new Claim(ClaimTypes.Email, account.Login),
+                new Claim(ClaimTypes.Email, account.Email),
                 new Claim(ClaimTypes.Role, account.Role.ToString()),
             };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
-                .GetBytes("testSuprSecrettestSuprSecrettestSuprSecret"));
-
+            
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSecrets:TokenSecret").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
             var token = new JwtSecurityToken(
@@ -41,7 +45,7 @@ namespace Identity.Api.Services.JwtService
                 return null;
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("testSuprSecret");
+            var key = Encoding.ASCII.GetBytes(_config.GetSection("AppSecrets:TokenSecret").Value);
             try
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
